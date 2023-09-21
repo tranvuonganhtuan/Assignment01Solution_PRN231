@@ -1,5 +1,7 @@
-﻿using BusinessObject;
+﻿using AutoMapper;
+using BusinessObject;
 using BusinessObject.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,47 +10,58 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class ProductDAO : IProductRepository
+    public class ProductDAO : IGenericRepository<Product>
     {
-        private List<Product> products = new List<Product>();  // Simulated data store
+        private readonly FStoreDBContext _context;
+        private readonly IMapper _mapper;
 
-        public Product GetProductById(int productId)
+        public ProductDAO(FStoreDBContext context, IMapper mapper)
         {
-            return products.FirstOrDefault(p => p.ProductId == productId);
+            _context = context;
+            _mapper = mapper;
         }
 
-        public IEnumerable<Product> GetAllProducts()
+        public IEnumerable<Product> GetAll()
         {
-            return products;
+            var products = _context.Products.ToList();
+            return _mapper.Map<List<Product>>(products);
         }
 
-        public void AddProduct(Product product)
+        public Product GetById(object id)
         {
-            products.Add(product);
+            var productId = Convert.ToInt32(id);
+            var productEntity = _context.Products.FirstOrDefault(p => p.ProductId == productId);
+            return _mapper.Map<Product>(productEntity);
         }
 
-        public void UpdateProduct(Product product)
+        public void Insert(Product product)
         {
-            // Update the product in the data store
-            var existingProduct = products.FirstOrDefault(p => p.ProductId == product.ProductId);
-            if (existingProduct != null)
+            var productEntity = _mapper.Map<Product>(product);
+            _context.Products.Add(productEntity);
+            _context.SaveChanges();
+        }
+
+        public void Update(Product product)
+        {
+            var productEntity = _mapper.Map<Product>(product);
+            _context.Entry(productEntity).State = EntityState.Modified;
+            _context.SaveChanges();
+        }
+
+        public void Delete(object id)
+        {
+            var productId = Convert.ToInt32(id);
+            var existing = _context.Products.FirstOrDefault(p => p.ProductId == productId);
+            if (existing != null)
             {
-                existingProduct.CategoryId = product.CategoryId;
-                existingProduct.ProductName = product.ProductName;
-                existingProduct.Weight = product.Weight;
-                existingProduct.UnitPrice = product.UnitPrice;
-                existingProduct.UnitsInStock = product.UnitsInStock;
+                _context.Products.Remove(existing);
+                _context.SaveChanges();
             }
         }
 
-        public void DeleteProduct(int productId)
+        public void Save()
         {
-            // Delete the product from the data store
-            var productToRemove = products.FirstOrDefault(p => p.ProductId == productId);
-            if (productToRemove != null)
-            {
-                products.Remove(productToRemove);
-            }
+            _context.SaveChanges();
         }
     }
 }

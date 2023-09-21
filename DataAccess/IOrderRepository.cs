@@ -8,12 +8,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public interface IOrderRepository
+    public interface IOrderRepository : IGenericRepository<Order>
     {
-        Order GetOrderById(int orderId);
-        IEnumerable<Order> GetAllOrders();
-        void AddOrder(Order order);
-        void UpdateOrder(Order order);
-        void DeleteOrder(int orderId);
+        IEnumerable<Order> GetOrdersByMember(int memberId);
+        // Add more specific methods related to orders if needed
     }
 }

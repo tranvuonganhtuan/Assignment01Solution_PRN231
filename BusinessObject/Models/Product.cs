@@ -19,11 +19,5 @@ namespace BusinessObject.Models
 
         public virtual Category? Category { get; set; }
         public virtual ICollection<OrderDetail> OrderDetails { get; set; }
-        public bool IsUnitPriceValid()
-        {
-            // Implement unit price validation logic
-            // Example: Check if the unit price is a non-negative value
-            return UnitPrice >= 0;
-        }
     }
 }

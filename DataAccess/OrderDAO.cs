@@ -1,5 +1,7 @@
-﻿using BusinessObject;
+﻿using AutoMapper;
+using BusinessObject;
 using BusinessObject.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,47 +10,58 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public class OrderDAO : IOrderRepository
+    public class OrderDAO : IGenericRepository<Order>
     {
-        private List<Order> orders = new List<Order>();  // Simulated data store
+        private readonly FStoreDBContext _context;
+        private readonly IMapper _mapper;
 
-        public Order GetOrderById(int orderId)
+        public OrderDAO(FStoreDBContext context, IMapper mapper)
         {
-            return orders.FirstOrDefault(o => o.OrderId == orderId);
+            _context = context;
+            _mapper = mapper;
         }
 
-        public IEnumerable<Order> GetAllOrders()
+        public IEnumerable<Order> GetAll()
         {
-            return orders;
+            var orders = _context.Orders.ToList();
+            return _mapper.Map<List<Order>>(orders);
         }
 
-        public void AddOrder(Order order)
+        public Order GetById(object id)
         {
-            orders.Add(order);
+            var orderId = Convert.ToInt32(id);
+            var orderEntity = _context.Orders.FirstOrDefault(o => o.OrderId == orderId);
+            return _mapper.Map<Order>(orderEntity);
         }
 
-        public void UpdateOrder(Order order)
+        public void Insert(Order order)
         {
-            // Update the order in the data store
-            var existingOrder = orders.FirstOrDefault(o => o.OrderId == order.OrderId);
-            if (existingOrder != null)
+            var orderEntity = _mapper.Map<Order>(order);
+            _context.Orders.Add(orderEntity);
+            _context.SaveChanges();
+        }
+
+        public void Update(Order order)
+        {
+            var orderEntity = _mapper.Map<Order>(order);
+            _context.Entry(orderEntity).State = EntityState.Modified;
+            _context.SaveChanges();
+        }
+
+        public void Delete(object id)
+        {
+            var orderId = Convert.ToInt32(id);
+            var existing = _context.Orders.FirstOrDefault(o => o.OrderId == orderId);
+            if (existing != null)
             {
-                existingOrder.MemberId = order.MemberId;
-                existingOrder.OrderDate = order.OrderDate;
-                existingOrder.RequiredDate = order.RequiredDate;
-                existingOrder.ShippedDate = order.ShippedDate;
-                existingOrder.Freight = order.Freight;
+                _context.Orders.Remove(existing);
+                _context.SaveChanges();
             }
         }
 
-        public void DeleteOrder(int orderId)
+        public void Save()
         {
-            // Delete the order from the data store
-            var orderToRemove = orders.FirstOrDefault(o => o.OrderId == orderId);
-            if (orderToRemove != null)
-            {
-                orders.Remove(orderToRemove);
-            }
+            _context.SaveChanges();
         }
     }
 }

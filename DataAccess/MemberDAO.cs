@@ -1,54 +1,68 @@
-﻿using BusinessObject;
-using BusinessObject.Models;
+﻿using AutoMapper;
+using BusinessObject;
+    using BusinessObject.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
-namespace DataAccess
-{
-    public class MemberDAO : IMemberRepository
+    namespace DataAccess
     {
-        private List<Member> members = new List<Member>();  // Simulated data store
+    public class MemberDAO : IGenericRepository<Member>
+    {
+        private readonly FStoreDBContext _context;
+        private readonly IMapper _mapper;
 
-        public Member GetMemberById(int memberId)
+        public MemberDAO(FStoreDBContext context, IMapper mapper)
         {
-            return members.FirstOrDefault(m => m.MemberId == memberId);
+            _context = context;
+            _mapper = mapper;
         }
 
-        public IEnumerable<Member> GetAllMembers()
+        public IEnumerable<Member> GetAll()
         {
-            return members;
+            var members = _context.Members.ToList();
+            return _mapper.Map<List<Member>>(members);
         }
 
-        public void AddMember(Member member)
+        public Member GetById(object id)
         {
-            members.Add(member);
+            var memberId = Convert.ToInt32(id);
+            var memberEntity = _context.Members.FirstOrDefault(m => m.MemberId == memberId);
+            return _mapper.Map<Member>(memberEntity);
         }
 
-        public void UpdateMember(Member member)
+        public void Insert(Member member)
         {
-            // Update the member in the data store
-            var existingMember = members.FirstOrDefault(m => m.MemberId == member.MemberId);
-            if (existingMember != null)
+            var memberEntity = _mapper.Map<Member>(member);
+            _context.Members.Add(memberEntity);
+            _context.SaveChanges();
+        }
+
+        public void Update(Member member)
+        {
+            var memberEntity = _mapper.Map<Member>(member);
+            _context.Entry(memberEntity).State = EntityState.Modified;
+            _context.SaveChanges();
+        }
+
+        public void Delete(object id)
+        {
+            var memberId = Convert.ToInt32(id);
+            var existing = _context.Members.FirstOrDefault(m => m.MemberId == memberId);
+            if (existing != null)
             {
-                existingMember.Email = member.Email;
-                existingMember.CompanyName = member.CompanyName;
-                existingMember.City = member.City;
-                existingMember.Country = member.Country;
-                existingMember.Password = member.Password;
+                _context.Members.Remove(existing);
+                _context.SaveChanges();
             }
         }
 
-        public void DeleteMember(int memberId)
+       
+        public void Save()
         {
-            // Delete the member from the data store
-            var memberToRemove = members.FirstOrDefault(m => m.MemberId == memberId);
-            if (memberToRemove != null)
-            {
-                members.Remove(memberToRemove);
-            }
+            _context.SaveChanges();
         }
     }
 }

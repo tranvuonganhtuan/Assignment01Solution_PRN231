@@ -8,13 +8,10 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public interface IProductRepository
+    public interface IProductRepository : IGenericRepository<Product>
     {
-        Product GetProductById(int productId);
-        IEnumerable<Product> GetAllProducts();
-        void AddProduct(Product product);
-        void UpdateProduct(Product product);
-        void DeleteProduct(int productId);
+        IEnumerable<Product> GetProductsByCategory(int categoryId);
+        // Add more specific methods related to products if needed
     }
 
 }

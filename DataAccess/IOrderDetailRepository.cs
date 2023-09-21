@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace DataAccess
 {
-    public interface IOrderDetailRepository
+    public interface IOrderDetailRepository : IGenericRepository<OrderDetail>
     {
-        IEnumerable<OrderDetail> GetOrderDetailsByOrderId(int orderId);
-        void AddOrderDetail(OrderDetail orderDetail);
+        IEnumerable<OrderDetail> GetOrderDetailsByOrder(int orderId);
+        // Add more specific methods related to order details if needed
     }
 }
