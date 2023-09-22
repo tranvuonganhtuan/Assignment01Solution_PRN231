@@ -1,7 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using BusinessObject.Models;
-using DataAccess;
+using DataAccess.Repository;
 
 namespace eStoreAPI.Controllers
 {
@@ -9,57 +14,35 @@ namespace eStoreAPI.Controllers
     [ApiController]
     public class MembersController : ControllerBase
     {
-        private readonly IGenericRepository<Member> _memberRepository;
-
-        public MembersController(IGenericRepository<Member> memberRepository)
-        {
-            _memberRepository = memberRepository;
-        }
-
+        private IMemberRepository repository = new MemberRepository();
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Member>>> GetMembers()
+        public ActionResult<IEnumerable<Member>> GetMembers() => repository.GetAllMembers();
+        [HttpPost]
+        public IActionResult PostMembers(Member m)
         {
-            var members = _memberRepository.GetAll();
-            return Ok(members);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Member>> GetMember(int id)
-        {
-            var member = _memberRepository.GetById(id);
-            if (member == null)
-                return NotFound();
-
-            return member;
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMember(int id, Member member)
-        {
-            if (id != member.MemberId)
-                return BadRequest();
-
-            _memberRepository.Update(member);
-            _memberRepository.Save();
-
+            repository.AddMember(m);
             return NoContent();
         }
-
-        [HttpPost]
-        public async Task<ActionResult<Member>> PostMember(Member member)
+        [HttpDelete("id")]
+        public IActionResult DeleteMember(int id)
         {
-            _memberRepository.Insert(member);
-            _memberRepository.Save();
-
-            return CreatedAtAction("GetMember", new { id = member.MemberId }, member);
+            var p = repository.GetMemberById(id);
+            if (p == null)
+            {
+                return NotFound();
+            }
+            repository.DeleteMember(p);
+            return NoContent();
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMember(int id)
+        [HttpPut("id")]
+        public IActionResult UpdateMember(int id, Member m)
         {
-            _memberRepository.Delete(id);
-            _memberRepository.Save();
-
+            var mTmp = repository.GetMemberById(id);
+            if (m == null)
+            {
+                return NotFound();
+            }
+            repository.UpdateMember(m);
             return NoContent();
         }
     }

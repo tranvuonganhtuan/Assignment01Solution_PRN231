@@ -1,11 +1,12 @@
-﻿using DataAccess;
-using BusinessObject.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using BusinessObject.Models;
+using DataAccess.Repository;
 
 namespace eStoreAPI.Controllers
 {
@@ -13,56 +14,35 @@ namespace eStoreAPI.Controllers
     [ApiController]
     public class OrderDetailsController : ControllerBase
     {
-        private readonly IGenericRepository<OrderDetail> _orderDetailRepository;
-
-        public OrderDetailsController(IGenericRepository<OrderDetail> orderDetailRepository)
-        {
-            _orderDetailRepository = orderDetailRepository;
-        }
-
+        private IOrderDetailRepository repository = new OrderDetailRepository();
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetOrderDetails()
+        public ActionResult<IEnumerable<OrderDetail>> GetOrderDetails() => repository.GetAllOrderDetails();
+        [HttpPost]
+        public IActionResult PostOrderDetail(OrderDetail orderDetail)
         {
-            var orderDetails = _orderDetailRepository.GetAll();
-            return Ok(orderDetails);
-        }
-
-        [HttpGet("{orderId}/{productId}")]
-        public async Task<ActionResult<OrderDetail>> GetOrderDetail(int orderId, int productId)
-        {
-            var orderDetail = _orderDetailRepository.GetById(new object[] { orderId, productId });
-            if (orderDetail == null)
-                return NotFound();
-
-            return orderDetail;
-        }
-
-        [HttpPut("{orderId}/{productId}")]
-        public async Task<IActionResult> PutOrderDetail(int orderId, int productId, OrderDetail orderDetail)
-        {
-            if (orderId != orderDetail.OrderId || productId != orderDetail.ProductId)
-                return BadRequest();
-
-            _orderDetailRepository.Update(orderDetail);
-
+            repository.AddOrderDetail(orderDetail);
             return NoContent();
         }
-
-        [HttpPost]
-        public async Task<ActionResult<OrderDetail>> PostOrderDetail(OrderDetail orderDetail)
+        [HttpDelete("id")]
+        public IActionResult DeleteOrderDetail(int id)
         {
-            _orderDetailRepository.Insert(orderDetail);
-            _orderDetailRepository.Save();
-
-            return CreatedAtAction("GetOrderDetail", new { orderId = orderDetail.OrderId, productId = orderDetail.ProductId }, orderDetail);
+            var ordetail = repository.GetOrderDetailById(id);
+            if (ordetail == null)
+            {
+                return NotFound();
+            }
+            repository.DeleteOrderDetail(ordetail);
+            return NoContent();
         }
-
-        [HttpDelete("{orderId}/{productId}")]
-        public async Task<IActionResult> DeleteOrderDetail(int orderId, int productId)
+        [HttpPut("id")]
+        public IActionResult UpdateOrderDetail(int id, OrderDetail orderDetail)
         {
-            _orderDetailRepository.Delete(new object[] { orderId, productId });
-            _orderDetailRepository.Save();
-
+            var odTmp = repository.GetOrderDetailById(id);
+            if (orderDetail == null)
+            {
+                return NotFound();
+            }
+            repository.UpdateOrderDetail(orderDetail);
             return NoContent();
         }
     }

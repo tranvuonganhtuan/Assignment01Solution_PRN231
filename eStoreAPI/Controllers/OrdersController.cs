@@ -1,11 +1,12 @@
-﻿using DataAccess;
-using BusinessObject.Models;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using BusinessObject.Models;
+using DataAccess.Repository;
 
 namespace eStoreAPI.Controllers
 {
@@ -13,56 +14,35 @@ namespace eStoreAPI.Controllers
     [ApiController]
     public class OrdersController : ControllerBase
     {
-        private readonly IGenericRepository<Order> _orderRepository;
-
-        public OrdersController(IGenericRepository<Order> orderRepository)
-        {
-            _orderRepository = orderRepository;
-        }
-
+        private IOrderRepository repository = new OrderRepository();
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Order>>> GetOrders()
+        public ActionResult<IEnumerable<Order>> GetOrders() => repository.GetAllOrders();
+        [HttpPost]
+        public IActionResult PostOrders(Order o)
         {
-            var orders = _orderRepository.GetAll();
-            return Ok(orders);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Order>> GetOrder(int id)
-        {
-            var order = _orderRepository.GetById(id);
-            if (order == null)
-                return NotFound();
-
-            return order;
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutOrder(int id, Order order)
-        {
-            if (id != order.OrderId)
-                return BadRequest();
-
-            _orderRepository.Update(order);
-
+            repository.AddOrder(o);
             return NoContent();
         }
-
-        [HttpPost]
-        public async Task<ActionResult<Order>> PostOrder(Order order)
+        [HttpDelete("id")]
+        public IActionResult DeleteOrders(int id)
         {
-            _orderRepository.Insert(order);
-            _orderRepository.Save();
-
-            return CreatedAtAction("GetOrder", new { id = order.OrderId }, order);
+            var p = repository.GetOrderById(id);
+            if (p == null)
+            {
+                return NotFound();
+            }
+            repository.DeleteOrder(p);
+            return NoContent();
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteOrder(int id)
+        [HttpPut("id")]
+        public IActionResult UpdateOrders(Order o, int id)
         {
-            _orderRepository.Delete(id);
-            _orderRepository.Save();
-
+            var oTmp = repository.GetOrderById(id);
+            if (o == null)
+            {
+                return NotFound();
+            }
+            repository.UpdateOrder(o);
             return NoContent();
         }
     }

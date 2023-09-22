@@ -1,68 +1,44 @@
-﻿using DataAccess;
+﻿
 using BusinessObject.Models;
-using Microsoft.AspNetCore.Http;
+
+using DataAccess.Repository;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace eStoreAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly IGenericRepository<Product> _productRepository;
-
-        public ProductsController(IGenericRepository<Product> productRepository)
-        {
-            _productRepository = productRepository;
-        }
-
+        private IProductRepository repository = new ProductRepository();
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public ActionResult<IEnumerable<Product>> GetProducts() => repository.GetAllProducts();
+        [HttpPost]
+        public ActionResult PostProduct(Product p)
         {
-            var products = _productRepository.GetAll();
-            return Ok(products);
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
-        {
-            var product = _productRepository.GetById(id);
-            if (product == null)
-                return NotFound();
-
-            return product;
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutProduct(int id, Product product)
-        {
-            if (id != product.ProductId)
-                return BadRequest();
-
-            _productRepository.Update(product);
-
+            repository.AddProduct(p);
             return NoContent();
         }
-
-        [HttpPost]
-        public async Task<ActionResult<Product>> PostProduct(Product product)
+        [HttpDelete("id")]
+        public ActionResult DeleteProduct(int id)
         {
-            _productRepository.Insert(product);
-            _productRepository.Save();
-
-            return CreatedAtAction("GetProduct", new { id = product.ProductId }, product);
+            var product = repository.GetProductById(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            repository.DeleteProduct(product);
+            return NoContent();
         }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteProduct(int id)
+        [HttpPut("id")]
+        public ActionResult UpdateProduct(Product p, int id)
         {
-            _productRepository.Delete(id);
-            _productRepository.Save();
-
+            var pTmp = repository.GetProductById(id);
+            if (p == null)
+            {
+                return NotFound();
+            }
+            repository.UpdateProduct(p);
             return NoContent();
         }
     }
