@@ -1,4 +1,5 @@
-﻿using DataAccess.Repository;
+﻿using BusinessObject.Models;
+using DataAccess.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,83 @@ namespace DataAccess.DAO
 {
     public class OrderDetailDAO
     {
-        private readonly IOrderDetailRepository _orderDetailRepository;
-
-        public OrderDetailDAO(IOrderDetailRepository orderDetailRepository)
+        public static List<OrderDetail> GetOrderDetails()
         {
-            _orderDetailRepository = orderDetailRepository;
+            var listOrderDetails = new List<OrderDetail>();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    listOrderDetails = context.OrderDetails.ToList();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return listOrderDetails;
         }
-
-        // Implement specific business logic or additional methods related to OrderDetail data access if needed
-        // You can use _orderDetailRepository to interact with the data store for order details
+        public static OrderDetail FindOrderDetailById(int orderDetailId)
+        {
+            OrderDetail orderDetail = new OrderDetail();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    orderDetail = context.OrderDetails.SingleOrDefault(c => c.OrderId == orderDetailId);
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            return orderDetail;
+        }
+        public static void AddOrderDetail(OrderDetail orderDetail)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.OrderDetails.Add(orderDetail);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        public static void DeleteOrderDetail(OrderDetail orderDetail)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    var p1 = context.OrderDetails.SingleOrDefault(c => c.OrderId == orderDetail.OrderId);
+                    context.OrderDetails.Remove(p1);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
+        public static void UpdateOrderDetail(OrderDetail orderDetail)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Entry<OrderDetail>(orderDetail).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }

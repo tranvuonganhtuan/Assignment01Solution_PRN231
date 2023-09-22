@@ -1,4 +1,5 @@
 ﻿using BusinessObject.Models;
+using DataAccess.DAO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,43 +10,19 @@ namespace DataAccess.Repository
 {
     public class OrderDetailRepository : IOrderDetailRepository
     {
-        private readonly FStoreDBContext _dbContext;
+        public void AddOrderDetail(OrderDetail orderDetail) => OrderDetailDAO.AddOrderDetail(orderDetail);
+        
 
-        public OrderDetailRepository(FStoreDBContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public void DeleteOrderDetail(OrderDetail orderDetail) => OrderDetailDAO.DeleteOrderDetail(orderDetail);
+        
 
-        public OrderDetail GetOrderDetailById(int orderId, int productId)
-        {
-            return _dbContext.OrderDetails.FirstOrDefault(o => o.OrderId == orderId && o.ProductId == productId);
-        }
+        public List<OrderDetail> GetAllOrderDetails() => OrderDetailDAO.GetOrderDetails();
+        
 
-        public IEnumerable<OrderDetail> GetAllOrderDetails()
-        {
-            return _dbContext.OrderDetails.ToList();
-        }
+        public OrderDetail GetOrderDetailById(int orderId) => OrderDetailDAO.FindOrderDetailById(orderId);
+        
 
-        public void AddOrderDetail(OrderDetail orderDetail)
-        {
-            _dbContext.OrderDetails.Add(orderDetail);
-            _dbContext.SaveChanges();
-        }
-
-        public void UpdateOrderDetail(OrderDetail orderDetail)
-        {
-            _dbContext.OrderDetails.Update(orderDetail);
-            _dbContext.SaveChanges();
-        }
-
-        public void DeleteOrderDetail(int orderId, int productId)
-        {
-            var orderDetail = _dbContext.OrderDetails.FirstOrDefault(o => o.OrderId == orderId && o.ProductId == productId);
-            if (orderDetail != null)
-            {
-                _dbContext.OrderDetails.Remove(orderDetail);
-                _dbContext.SaveChanges();
-            }
-        }
+        public void UpdateOrderDetail(OrderDetail orderDetail) => OrderDetailDAO.UpdateOrderDetail(orderDetail);
+       
     }
 }

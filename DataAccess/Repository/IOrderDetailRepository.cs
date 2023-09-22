@@ -9,10 +9,10 @@ namespace DataAccess.Repository
 {
     public interface IOrderDetailRepository
     {
-        OrderDetail GetOrderDetailById(int orderId, int productId);
-        IEnumerable<OrderDetail> GetAllOrderDetails();
+        OrderDetail GetOrderDetailById(int orderId);
+        List <OrderDetail> GetAllOrderDetails();
         void AddOrderDetail(OrderDetail orderDetail);
         void UpdateOrderDetail(OrderDetail orderDetail);
-        void DeleteOrderDetail(int orderId, int productId);
+        void DeleteOrderDetail(OrderDetail orderDetail);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BusinessObject.Models;
+using DataAccess.DAO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,45 +10,18 @@ namespace DataAccess.Repository
 {
     public class MemberRepository : IMemberRepository
     {
-        private readonly FStoreDBContext _dbContext;
+        public void AddMember(Member member) => MemberDAO.AddMember(member);
 
-        public MemberRepository(FStoreDBContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
 
-        public Member GetMemberById(int memberId)
-        {
-            return _dbContext.Members.FirstOrDefault(m => m.MemberId == memberId);
-        }
+        public void DeleteMember(Member member) => MemberDAO.DeleteMember(member);
 
-        public IEnumerable<Member> GetAllMembers()
-        {
-            return _dbContext.Members.ToList();
-        }
 
-        public void AddMember(Member member)
-        {
-            _dbContext.Members.Add(member);
-            _dbContext.SaveChanges();
-        }
+        public List<Member> GetAllMembers() => MemberDAO.GetMembers();
 
-        public void UpdateMember(Member member)
-        {
-            _dbContext.Members.Update(member);
-            _dbContext.SaveChanges();
-        }
+        public Member GetMemberById(int id) => MemberDAO.FindMemberById(id);
 
-        public void DeleteMember(int memberId)
-        {
-            var member = _dbContext.Members.FirstOrDefault(m => m.MemberId == memberId);
-            if (member != null)
-            {
-                _dbContext.Members.Remove(member);
-                _dbContext.SaveChanges();
-            }
-        }
+        public void UpdateMember(Member member) => MemberDAO.UpdateMember(member);
 
-        
+
     }
 }

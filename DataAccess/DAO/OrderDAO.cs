@@ -1,4 +1,5 @@
-﻿using DataAccess.Repository;
+﻿using BusinessObject.Models;
+using DataAccess.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,83 @@ namespace DataAccess.DAO
 {
     public class OrderDAO
     {
-        private readonly IOrderRepository _orderRepository;
-
-        public OrderDAO(IOrderRepository orderRepository)
+        public static List<Order> GetOrders()
         {
-            _orderRepository = orderRepository;
+            var orders = new List<Order>();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    orders = context.Orders.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return orders;
         }
-
-        // Implement specific business logic or additional methods related to Order data access if needed
-        // You can use _orderRepository to interact with the data store for orders
+        public static Order FindOrderById(int orderId)
+        {
+            Order o = new Order();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    o = context.Orders.SingleOrDefault(x => x.OrderId == orderId);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return o;
+        }
+        public static void AddOrder(Order order)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Orders.Add(order);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void UpdateOrder(Order order)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Entry<Order>(order).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void DeleteOrder(Order order)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    var p1 = context.Orders.SingleOrDefault(p => p.OrderId == order.OrderId);
+                    context.Orders.Remove(p1);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using DataAccess.Repository;
+﻿using BusinessObject.Models;
+using DataAccess.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,83 @@ namespace DataAccess.DAO
 {
     public class MemberDAO
     {
-        private readonly IMemberRepository _memberRepository;
-
-        public MemberDAO(IMemberRepository memberRepository)
+        public static List<Member> GetMembers()
         {
-            _memberRepository = memberRepository;
+            var listMembers = new List<Member>();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    listMembers = context.Members.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return listMembers;
         }
-
-        // Implement specific business logic or additional methods related to Member data access if needed
-        // You can use _memberRepository to interact with the data store for members
+        public static Member FindMemberById(int memId)
+        {
+            Member m = new Member();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    m = context.Members.SingleOrDefault(x => x.MemberId == memId);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return m;
+        }
+        public static void AddMember(Member m)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Members.Add(m);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void DeleteMember(Member m)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    var p1 = context.Members.SingleOrDefault(x => x.MemberId == m.MemberId);
+                    context.Members.Remove(p1);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void UpdateMember(Member m)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Entry<Member>(m).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using BusinessObject.Models;
+using DataAccess.DAO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,43 +10,19 @@ namespace DataAccess.Repository
 {
     public class OrderRepository : IOrderRepository
     {
-        private readonly FStoreDBContext _dbContext;
+        public void AddOrder(Order order) =>OrderDAO.AddOrder(order);
+        
 
-        public OrderRepository(FStoreDBContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public void DeleteOrder(Order order) => OrderDAO.DeleteOrder(order);
+        
 
-        public Order GetOrderById(int orderId)
-        {
-            return _dbContext.Orders.FirstOrDefault(o => o.OrderId == orderId);
-        }
+        public List<Order> GetAllOrders() => OrderDAO.GetOrders();
+        
 
-        public IEnumerable<Order> GetAllOrders()
-        {
-            return _dbContext.Orders.ToList();
-        }
+        public Order GetOrderById(int orderId) => OrderDAO.FindOrderById(orderId);
+        
 
-        public void AddOrder(Order order)
-        {
-            _dbContext.Orders.Add(order);
-            _dbContext.SaveChanges();
-        }
-
-        public void UpdateOrder(Order order)
-        {
-            _dbContext.Orders.Update(order);
-            _dbContext.SaveChanges();
-        }
-
-        public void DeleteOrder(int orderId)
-        {
-            var order = _dbContext.Orders.FirstOrDefault(o => o.OrderId == orderId);
-            if (order != null)
-            {
-                _dbContext.Orders.Remove(order);
-                _dbContext.SaveChanges();
-            }
-        }
+        public void UpdateOrder(Order order) => OrderDAO.UpdateOrder(order);
+        
     }
 }

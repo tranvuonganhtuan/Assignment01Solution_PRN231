@@ -1,4 +1,5 @@
 ﻿using BusinessObject.Models;
+using DataAccess.DAO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,43 +10,19 @@ namespace DataAccess.Repository
 {
     public class ProductRepository : IProductRepository
     {
-        private readonly FStoreDBContext _dbContext;
+        public void AddProduct(Product product) => ProductDAO.AddProduct(product);
+        
 
-        public ProductRepository(FStoreDBContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+        public void DeleteProduct(Product product) => ProductDAO.DeleteProduct(product);
+        
 
-        public Product GetProductById(int productId)
-        {
-            return _dbContext.Products.FirstOrDefault(p => p.ProductId == productId);
-        }
+        public List<Product> GetAllProducts() => ProductDAO.GetProducts();
+       
 
-        public IEnumerable<Product> GetAllProducts()
-        {
-            return _dbContext.Products.ToList();
-        }
+        public Product GetProductById(int productId) => ProductDAO.FindProductById(productId);
+        
 
-        public void AddProduct(Product product)
-        {
-            _dbContext.Products.Add(product);
-            _dbContext.SaveChanges();
-        }
-
-        public void UpdateProduct(Product product)
-        {
-            _dbContext.Products.Update(product);
-            _dbContext.SaveChanges();
-        }
-
-        public void DeleteProduct(int productId)
-        {
-            var product = _dbContext.Products.FirstOrDefault(p => p.ProductId == productId);
-            if (product != null)
-            {
-                _dbContext.Products.Remove(product);
-                _dbContext.SaveChanges();
-            }
-        }
+        public void UpdateProduct(Product product) => ProductDAO.UpdateProduct(product);    
+        
     }
 }

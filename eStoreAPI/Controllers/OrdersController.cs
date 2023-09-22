@@ -12,37 +12,37 @@ namespace eStoreAPI.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class MembersController : ControllerBase
+    public class OrdersController : ControllerBase
     {
-        private IMemberRepository repository = new MemberRepository();
+        private IOrderRepository repository = new OrderRepository();
         [HttpGet]
-        public ActionResult<IEnumerable<Member>> GetMembers() => repository.GetAllMembers();
+        public ActionResult<IEnumerable<Order>> GetOrders() => repository.GetAllOrders();
         [HttpPost]
-        public IActionResult PostMembers(Member m)
+        public IActionResult PostOrders(Order o)
         {
-            repository.AddMember(m);
+            repository.AddOrder(o);
             return NoContent();
         }
         [HttpDelete("id")]
-        public IActionResult DeleteMember(int id)
+        public IActionResult DeleteOrders(int id)
         {
-            var p = repository.GetMemberById(id);
+            var p = repository.GetOrderById(id);
             if (p == null)
             {
                 return NotFound();
             }
-            repository.DeleteMember(p);
+            repository.DeleteOrder(p);
             return NoContent();
         }
         [HttpPut("id")]
-        public IActionResult UpdateMember(int id, Member m)
+        public IActionResult UpdateOrders(Order o, int id)
         {
-            var mTmp = repository.GetMemberById(id);
-            if (m == null)
+            var oTmp = repository.GetOrderById(id);
+            if (o == null)
             {
                 return NotFound();
             }
-            repository.UpdateMember(m);
+            repository.UpdateOrder(o);
             return NoContent();
         }
     }

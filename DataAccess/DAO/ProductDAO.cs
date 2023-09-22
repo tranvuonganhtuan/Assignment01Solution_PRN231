@@ -1,4 +1,5 @@
-﻿using DataAccess.Repository;
+﻿using BusinessObject.Models;
+using DataAccess.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,14 +10,83 @@ namespace DataAccess.DAO
 {
     public class ProductDAO
     {
-        private readonly IProductRepository _productRepository;
-
-        public ProductDAO(IProductRepository productRepository)
+        public static List<Product> GetProducts()
         {
-            _productRepository = productRepository;
+            var listProducts = new List<Product>();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    listProducts = context.Products.ToList();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return listProducts;
         }
-
-        // Implement specific business logic or additional methods related to Product data access if needed
-        // You can use _productRepository to interact with the data store for products
+        public static Product FindProductById(int prodId)
+        {
+            Product p = new Product();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    p = context.Products.SingleOrDefault(x => x.ProductId == prodId);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return p;
+        }
+        public static void AddProduct(Product p)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Products.Add(p);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void DeleteProduct(Product p)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    var p1 = context.Products.SingleOrDefault(c => c.ProductId == p.ProductId);
+                    context.Products.Remove(p1);
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
+        public static void UpdateProduct(Product p)
+        {
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    context.Entry<Product>(p).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+                    context.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }
