@@ -1,50 +1,103 @@
-﻿using eStoreClient.Models;
+﻿
+using BusinessObject.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace eStoreClient.Controllers
 {
     public class ProductController : Controller
     {
-        Uri baseAddress = new Uri("http://localhost:44314/api");
-        private readonly HttpClient _httpClient;
-
+        private readonly HttpClient client = null;
+        private string ProductApiUrl = "";
         public ProductController()
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = baseAddress;
+            client = new HttpClient();
+            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
+            client.DefaultRequestHeaders.Accept.Add(contentType);
+            ProductApiUrl = "https://localhost:44314/api/product";
+        }
+        // GET: ProductController
+        public async Task<IActionResult> Index()
+        {
+            HttpResponseMessage response = await client.GetAsync(ProductApiUrl);
+            string strData = await response.Content.ReadAsStringAsync();
+            var options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            List<Product> listProducts = JsonSerializer.Deserialize<List<Product>>(strData, options);
+            return View(listProducts);
         }
 
-        [HttpGet]
-        public IActionResult Index()
+        // GET: ProductController/Details/5
+        public ActionResult Details(int id)
+        {
+            return View();
+        }
+
+        // GET: ProductController/Create
+        public ActionResult Create()
+        {
+            return View();
+        }
+
+        // POST: ProductController/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Create(IFormCollection collection)
         {
             try
             {
-                List<ProductViewModel> productList = new List<ProductViewModel>();
-                HttpResponseMessage response = _httpClient.GetAsync("product/Get").Result;
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    productList = JsonConvert.DeserializeObject<List<ProductViewModel>>(data);
-                }
-                else
-                {
-                    // Log the error
-                    Console.WriteLine("Error accessing the API: " + response.ReasonPhrase);
-                    // You might want to log this error in a file or a logging system
-                }
-
-                return View(productList);
+                return RedirectToAction(nameof(Index));
             }
-            catch (Exception ex)
+            catch
             {
-                // Log the error
-                Console.WriteLine("An error occurred: " + ex.Message);
-                return View(new List<ProductViewModel>());
+                return View();
+            }
+        }
+
+        // GET: ProductController/Edit/5
+        public ActionResult Edit(int id)
+        {
+            return View();
+        }
+
+        // POST: ProductController/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(int id, IFormCollection collection)
+        {
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
+            }
+        }
+
+        // GET: ProductController/Delete/5
+        public ActionResult Delete(int id)
+        {
+            return View();
+        }
+
+        // POST: ProductController/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public ActionResult Delete(int id, IFormCollection collection)
+        {
+            try
+            {
+                return RedirectToAction(nameof(Index));
+            }
+            catch
+            {
+                return View();
             }
         }
     }
