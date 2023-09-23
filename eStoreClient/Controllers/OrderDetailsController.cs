@@ -16,7 +16,7 @@ namespace eStoreClient.Controllers
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-            OrderDetailApiUrl = "http://localhost:44314/api/orderDetail";
+            OrderDetailApiUrl = "https://localhost:44314/api/orderDetails";
         }
         // GET: OrderDetailController
         public async Task<IActionResult> Index()

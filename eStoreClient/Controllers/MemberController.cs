@@ -14,7 +14,7 @@ namespace eStoreClient.Controllers
             client = new HttpClient();
             var contentType = new MediaTypeWithQualityHeaderValue("application/json");
             client.DefaultRequestHeaders.Accept.Add(contentType);
-            MemberApiUrl = "http://localhost:44314/api/member";
+            MemberApiUrl = "https://localhost:44314/api/members";
         }
         // GET: MemberController
         public async Task<IActionResult> Index()

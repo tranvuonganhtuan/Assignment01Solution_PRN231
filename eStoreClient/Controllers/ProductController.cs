@@ -9,7 +9,7 @@ namespace eStoreClient.Controllers
 {
     public class ProductController : Controller
     {
-        Uri baseAddress = new Uri("http://localhost:44314/api");
+        Uri baseAddress = new Uri("https://localhost:44314/api");
         private readonly HttpClient _httpClient;
 
         public ProductController()
