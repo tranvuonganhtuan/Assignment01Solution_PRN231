@@ -32,9 +32,6 @@ namespace eStoreClient.Controllers
                 var result = JsonConvert.DeserializeObject<List<Product>>(await response.Content.ReadAsStringAsync());
                 return View(result);
             }
-
-
-
             return View(null);
         }
     }
