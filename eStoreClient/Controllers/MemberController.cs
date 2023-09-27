@@ -1,5 +1,6 @@
 ﻿using BusinessObject.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -7,26 +8,27 @@ namespace eStoreClient.Controllers
 {
     public class MemberController : Controller
     {
-        private readonly HttpClient client = null;
-        private string MemberApiUrl = "";
-        public MemberController()
+        private readonly IHttpClientFactory _client;
+        private string MemberApiUrl;
+        public MemberController(IHttpClientFactory client)
         {
-            client = new HttpClient();
-            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
-            client.DefaultRequestHeaders.Accept.Add(contentType);
-            MemberApiUrl = "https://localhost:44314/api/members";
+            this._client = client;
+            MemberApiUrl = "https://localhost:7153/api/Members";
         }
         // GET: MemberController
         public async Task<IActionResult> Index()
         {
-            HttpResponseMessage response = await client.GetAsync(MemberApiUrl);
-            string strData = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions
+            var httpClient = _client.CreateClient();
+
+            var url = this.MemberApiUrl + "/GetMembers";
+
+           var response = await httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
             {
-                PropertyNameCaseInsensitive = true
-            };
-            List<Member> listMembers = JsonSerializer.Deserialize<List<Member>>(strData, options);
-            return View(listMembers);
+                var result = JsonConvert.DeserializeObject<List<Member>>(await response.Content.ReadAsStringAsync());
+                return View(result);
+            }
+            return View(null);
         }
 
         // GET: MemberController/Details/5

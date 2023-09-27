@@ -1,4 +1,5 @@
-﻿using eStoreClient.Models;
+﻿using BusinessObject.Models;
+using eStoreClient.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
@@ -23,13 +24,13 @@ namespace eStoreClient.Controllers
         {
             try
             {
-                List<ProductViewModel> productList = new List<ProductViewModel>();
+                List<Product> productList = new List<Product>();
                 HttpResponseMessage response = _httpClient.GetAsync("product/Get").Result;
 
                 if (response.IsSuccessStatusCode)
                 {
                     string data = response.Content.ReadAsStringAsync().Result;
-                    productList = JsonConvert.DeserializeObject<List<ProductViewModel>>(data);
+                    productList = JsonConvert.DeserializeObject<List<Product>>(data);
                 }
                 else
                 {

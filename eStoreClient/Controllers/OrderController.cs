@@ -1,5 +1,6 @@
 ﻿using BusinessObject.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -7,24 +8,27 @@ namespace eStoreClient.Controllers
 {
     public class OrderController : Controller
     {
-        private readonly HttpClient client = null;
-        private string OrderApiUrl = "";
-        public OrderController(HttpClient client)
+        private readonly IHttpClientFactory _client;
+        private string OrderApiUrl;
+        public OrderController(IHttpClientFactory client)
         {
 
-            client = new HttpClient();
-            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
-            client.DefaultRequestHeaders.Accept.Add(contentType);
-            OrderApiUrl = "https://localhost:44314/api/orders";
+            this._client = client;
+            OrderApiUrl = "https://localhost:7153/api/Orders";
 
         }
         public async Task<IActionResult> Index()
         {
-            HttpResponseMessage response = await client.GetAsync(OrderApiUrl);
-            string strData = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            List<Order> listOrders = JsonSerializer.Deserialize<List<Order>>(strData, options);
-            return View(listOrders);
+            var httClient = _client.CreateClient();
+            var url = this.OrderApiUrl + "/GetOrders";
+            var response = await httClient.GetAsync(url);
+            if(response.IsSuccessStatusCode)
+            {
+                var result = JsonConvert.DeserializeObject<List<Order>>(await response.Content.ReadAsStringAsync());
+                return View(result);
+            }
+            
+            return View(null);
         }
 
         // GET: OrderController/Details/5
