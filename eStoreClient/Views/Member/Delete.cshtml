@@ -1,0 +1,9 @@
+﻿@model BusinessObject.Models.Member
+
+<h1>Delete Member</h1>
+
+<p>Are you sure you want to delete the member with the ID @Model.MemberId</p>
+
+<form action="/Member/Delete/@Model.MemberId" method="post">
+    <input type="submit" value="Delete" />
+</form>

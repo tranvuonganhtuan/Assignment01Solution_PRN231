@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Text;
 using System.Text.Json;
 
 namespace eStoreClient.Controllers
@@ -46,17 +48,22 @@ namespace eStoreClient.Controllers
         // POST: MemberController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<IActionResult> Create(Member member)
         {
-            try
+            var httpClient = _client.CreateClient();
+
+            var url = this.MemberApiUrl + "/CreateMember";
+
+            var content = new StringContent(JsonConvert.SerializeObject(member), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            var response = await httpClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(member);
         }
+
 
         // GET: MemberController/Edit/5
         public ActionResult Edit(int id)
@@ -67,16 +74,20 @@ namespace eStoreClient.Controllers
         // POST: MemberController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<IActionResult> Edit(Member member)
         {
-            try
+            var httpClient = _client.CreateClient();
+
+            var url = this.MemberApiUrl + "/UpdateMember";
+
+            var content = new StringContent(JsonConvert.SerializeObject(member), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            var response = await httpClient.PutAsync(url, content);
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(member);
         }
 
         // GET: MemberController/Delete/5
@@ -88,16 +99,18 @@ namespace eStoreClient.Controllers
         // POST: MemberController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
-            try
+            var httpClient = _client.CreateClient();
+
+            var url = this.MemberApiUrl + $"/DeleteMember/{id}";
+
+            var response = await httpClient.DeleteAsync(url);
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View();
         }
     }
 }
