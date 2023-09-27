@@ -2,6 +2,8 @@ using BusinessObject.Models;
 using DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,11 +14,16 @@ builder.Services.AddDbContext<FStoreDBContext>(options => options.UseSqlServer(b
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-
+//Json 
+builder.Services.AddControllers().AddNewtonsoftJson(
+    options => options.SerializerSettings.ReferenceLoopHandling=Newtonsoft.Json.ReferenceLoopHandling.Ignore).AddNewtonsoftJson(
+    options => options.SerializerSettings.ContractResolver = new DefaultContractResolver());
 
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+app.UseCors(c => c.AllowAnyHeader().AllowAnyOrigin().AllowAnyMethod());
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
