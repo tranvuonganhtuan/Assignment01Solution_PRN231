@@ -2,6 +2,7 @@
 using BusinessObject.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -9,26 +10,25 @@ namespace eStoreClient.Controllers
 {
     public class OrderDetailsController : Controller
     {
-        private readonly HttpClient client = null;
-        private string OrderDetailApiUrl = "";
-        public OrderDetailsController()
+        private readonly IHttpClientFactory _client;
+        private string OrderDetailApiUrl ;
+        public OrderDetailsController(IHttpClientFactory client)
         {
-            client = new HttpClient();
-            var contentType = new MediaTypeWithQualityHeaderValue("application/json");
-            client.DefaultRequestHeaders.Accept.Add(contentType);
-            OrderDetailApiUrl = "https://localhost:44314/api/orderDetails";
+            this._client = client;
+            OrderDetailApiUrl = "https://localhost:7153/api/OrderDetails";
         }
         // GET: OrderDetailController
         public async Task<IActionResult> Index()
         {
-            HttpResponseMessage response = await client.GetAsync(OrderDetailApiUrl);
-            string strData = await response.Content.ReadAsStringAsync();
-            var options = new JsonSerializerOptions
+            var httClient = _client.CreateClient();
+            var url = this.OrderDetailApiUrl + "/GetOrderDetails";
+            var response = await httClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
             {
-                PropertyNameCaseInsensitive = true
-            };
-            List<OrderDetail> listOrderDetails = JsonSerializer.Deserialize<List<OrderDetail>>(strData, options);
-            return View(listOrderDetails);
+                var result = JsonConvert.DeserializeObject<List<OrderDetail>>(await response.Content.ReadAsStringAsync());
+                return View(result);
+            }
+            return View(null);
         }
 
         // GET: OrderDetailController/Details/5

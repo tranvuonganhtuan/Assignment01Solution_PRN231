@@ -10,43 +10,32 @@ namespace eStoreClient.Controllers
 {
     public class ProductController : Controller
     {
-        Uri baseAddress = new Uri("https://localhost:44314/api");
-        private readonly HttpClient _httpClient;
+       
+        private readonly IHttpClientFactory _client;
+        private string ProductApiUrl;
 
-        public ProductController()
+
+        public ProductController(IHttpClientFactory client)
         {
-            _httpClient = new HttpClient();
-            _httpClient.BaseAddress = baseAddress;
+            this._client = client;
+            ProductApiUrl = "https://localhost:7153/api/Product";
         }
-
-        [HttpGet]
-        public IActionResult Index()
+        // Get: ProductController
+        public async Task<IActionResult> Index()
         {
-            try
-            {
-                List<Product> productList = new List<Product>();
-                HttpResponseMessage response = _httpClient.GetAsync("product/Get").Result;
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string data = response.Content.ReadAsStringAsync().Result;
-                    productList = JsonConvert.DeserializeObject<List<Product>>(data);
-                }
-                else
-                {
-                    // Log the error
-                    Console.WriteLine("Error accessing the API: " + response.ReasonPhrase);
-                    // You might want to log this error in a file or a logging system
-                }
-
-                return View(productList);
-            }
-            catch (Exception ex)
+            var httClient = _client.CreateClient();
+            var url = this.ProductApiUrl + "/GetProducts";
+            var response = await httClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
             {
-                // Log the error
-                Console.WriteLine("An error occurred: " + ex.Message);
-                return View(new List<ProductViewModel>());
+                var result = JsonConvert.DeserializeObject<List<Product>>(await response.Content.ReadAsStringAsync());
+                return View(result);
             }
+
+
+
+            return View(null);
         }
     }
 }
