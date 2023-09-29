@@ -1,7 +1,10 @@
 ﻿using BusinessObject.Models;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Diagnostics.Metrics;
 using System.Net.Http.Headers;
+using System.Net.Mime;
+using System.Text;
 using System.Text.Json;
 
 namespace eStoreClient.Controllers
@@ -31,11 +34,7 @@ namespace eStoreClient.Controllers
             return View(null);
         }
 
-        // GET: OrderController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
+        
 
         // GET: OrderController/Create
         public ActionResult Create()
@@ -46,58 +45,87 @@ namespace eStoreClient.Controllers
         // POST: OrderController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult> CreateAsync(Order order)
         {
-            try
+            var httpClient = _client.CreateClient();
+            var url = this.OrderApiUrl + "/PostOrders";
+
+            var content = new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            var response = await httpClient.PostAsync(url, content);
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(order);
         }
 
         // GET: OrderController/Edit/5
-        public ActionResult Edit(int id)
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            return View();
+            var httpClient = _client.CreateClient();
+
+            var url = this.OrderApiUrl + "/GetOrderById/" + id;
+
+            var response = await httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonConvert.DeserializeObject<Order>(await response.Content.ReadAsStringAsync());
+                return View(result);
+            }
+            return View(null);
         }
 
         // POST: OrderController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> EditAsync(Order order )
         {
-            try
+            var httpClient = _client.CreateClient();
+
+            var url = this.OrderApiUrl + "/UpdateOrders/id";
+            var content = new StringContent(JsonConvert.SerializeObject(order), Encoding.UTF8, MediaTypeNames.Application.Json);
+
+            var response = await httpClient.PutAsync(url, content);
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(order);
         }
 
         // GET: OrderController/Delete/5
-        public ActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            return View();
+            var httpClient = _client.CreateClient();
+
+            var url = this.OrderApiUrl + "/GetOrderById/" + id;
+
+            var response = await httpClient.GetAsync(url);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonConvert.DeserializeObject<Order>(await response.Content.ReadAsStringAsync());
+                return View(result);
+            }
+            return View(null);
         }
 
         // POST: OrderController/Delete/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        public async Task<IActionResult> Delete(int id, IFormCollection collection)
         {
-            try
+            var httpClient = _client.CreateClient();
+
+            var url = this.OrderApiUrl + "/Delete/" + id;
+
+            var response = await httpClient.DeleteAsync(url);
+            if (response.IsSuccessStatusCode)
             {
                 return RedirectToAction(nameof(Index));
             }
-            catch
-            {
-                return View();
-            }
+            return View(null);
         }
     }
 }

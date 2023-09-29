@@ -17,14 +17,28 @@ namespace eStoreAPI.Controllers
         private IOrderRepository repository = new OrderRepository();
         [HttpGet]
         public ActionResult<IEnumerable<Order>> GetOrders() => repository.GetAllOrders();
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Order>> GetOrderById(int id)
+        {
+            var order = repository.GetOrderById(id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(order);
+        }
+
         [HttpPost]
         public IActionResult PostOrders(Order o)
         {
             repository.AddOrder(o);
             return NoContent();
         }
-        [HttpDelete("id")]
-        public IActionResult DeleteOrders(int id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
             var p = repository.GetOrderById(id);
             if (p == null)
@@ -34,10 +48,10 @@ namespace eStoreAPI.Controllers
             repository.DeleteOrder(p);
             return NoContent();
         }
-        [HttpPut("id")]
-        public IActionResult UpdateOrders(Order o, int id)
+        [HttpPut("{id}")]
+        public IActionResult UpdateOrders(Order o)
         {
-            var oTmp = repository.GetOrderById(id);
+            var oTmp = repository.GetOrderById(o.OrderId);
             if (o == null)
             {
                 return NotFound();

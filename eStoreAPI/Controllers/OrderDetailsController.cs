@@ -18,17 +18,17 @@ namespace eStoreAPI.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<OrderDetail>> GetOrderDetails() => repository.GetAllOrderDetails();
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<OrderDetail>> GetOrderDetailById(int id)
+        [HttpGet("{orderId}")]
+        public async Task<ActionResult<IEnumerable<OrderDetail>>> GetOrderDetailsByOrderId(int orderId)
         {
-            var orderDetail = repository.GetOrderDetailById(id);
+            var orderDetails =  repository.GetOrderDetailsByOrderId(orderId);
 
-            if (orderDetail == null)
+            if (orderDetails == null)
             {
                 return NotFound();
             }
 
-            return Ok(orderDetail);
+            return Ok(orderDetails);
         }
 
         [HttpPost]
@@ -38,9 +38,9 @@ namespace eStoreAPI.Controllers
             return NoContent();
         }
         [HttpDelete("id")]
-        public IActionResult DeleteOrderDetail(int id)
+        public IActionResult Delete(int id)
         {
-            var ordetail = repository.GetOrderDetailById(id);
+            var ordetail = repository.GetOrderDetailsByOrderId(id);
             if (ordetail == null)
             {
                 return NotFound();
@@ -51,7 +51,7 @@ namespace eStoreAPI.Controllers
         [HttpPut("id")]
         public IActionResult UpdateOrderDetail(int id, OrderDetail orderDetail)
         {
-            var odTmp = repository.GetOrderDetailById(id);
+            var odTmp = repository.GetOrderDetailsByOrderId(id);
             if (orderDetail == null)
             {
                 return NotFound();

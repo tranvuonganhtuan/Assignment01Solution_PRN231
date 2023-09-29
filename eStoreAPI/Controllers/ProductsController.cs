@@ -20,7 +20,7 @@ namespace eStoreAPI.Controllers
             return NoContent();
         }
         [HttpDelete("id")]
-        public ActionResult DeleteProduct(int id)
+        public ActionResult Delete(int id)
         {
             var product = repository.GetProductById(id);
             if (product == null)

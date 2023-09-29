@@ -19,7 +19,7 @@ namespace DataAccess.Repository
         public List<OrderDetail> GetAllOrderDetails() => OrderDetailDAO.GetOrderDetails();
         
 
-        public OrderDetail GetOrderDetailById(int orderId) => OrderDetailDAO.FindOrderDetailById(orderId);
+        public OrderDetail GetOrderDetailsByOrderId(int orderId) => OrderDetailDAO.FindOrderDetailById(orderId);
         
 
         public void UpdateOrderDetail(OrderDetail orderDetail) => OrderDetailDAO.UpdateOrderDetail(orderDetail);
