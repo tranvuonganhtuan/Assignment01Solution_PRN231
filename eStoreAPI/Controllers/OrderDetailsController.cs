@@ -37,7 +37,7 @@ namespace eStoreAPI.Controllers
             repository.AddOrderDetail(orderDetail);
             return NoContent();
         }
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
             var ordetail = repository.GetOrderDetailsByOrderId(id);
@@ -48,7 +48,7 @@ namespace eStoreAPI.Controllers
             repository.DeleteOrderDetail(ordetail);
             return NoContent();
         }
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public IActionResult UpdateOrderDetail(int id, OrderDetail orderDetail)
         {
             var odTmp = repository.GetOrderDetailsByOrderId(id);
