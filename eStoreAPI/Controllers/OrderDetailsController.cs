@@ -49,9 +49,9 @@ namespace eStoreAPI.Controllers
             return NoContent();
         }
         [HttpPut("{id}")]
-        public IActionResult UpdateOrderDetail(int id, OrderDetail orderDetail)
+        public IActionResult UpdateOrderDetail( OrderDetail orderDetail)
         {
-            var odTmp = repository.GetOrderDetailsByOrderId(id);
+            var odTmp = repository.GetOrderDetailsByOrderId(orderDetail.OrderId);
             if (orderDetail == null)
             {
                 return NotFound();
