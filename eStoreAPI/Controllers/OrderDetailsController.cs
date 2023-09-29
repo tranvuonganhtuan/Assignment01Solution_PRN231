@@ -17,6 +17,20 @@ namespace eStoreAPI.Controllers
         private IOrderDetailRepository repository = new OrderDetailRepository();
         [HttpGet]
         public ActionResult<IEnumerable<OrderDetail>> GetOrderDetails() => repository.GetAllOrderDetails();
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<OrderDetail>> GetOrderDetailById(int id)
+        {
+            var orderDetail = repository.GetOrderDetailById(id);
+
+            if (orderDetail == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(orderDetail);
+        }
+
         [HttpPost]
         public IActionResult PostOrderDetail(OrderDetail orderDetail)
         {

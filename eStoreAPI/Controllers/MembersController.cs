@@ -17,14 +17,27 @@ namespace eStoreAPI.Controllers
         private IMemberRepository repository = new MemberRepository();
         [HttpGet]
         public ActionResult<IEnumerable<Member>> GetMembers() => repository.GetAllMembers();
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Member>> GetMemberById(int id)
+        {
+            var member =  repository.GetMemberById(id);
+
+            if (member == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(member);
+        }
         [HttpPost]
         public IActionResult PostMembers(Member m)
         {
             repository.AddMember(m);
             return NoContent();
         }
-        [HttpDelete("id")]
-        public IActionResult DeleteMember(int id)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
         {
             var p = repository.GetMemberById(id);
             if (p == null)
@@ -34,10 +47,10 @@ namespace eStoreAPI.Controllers
             repository.DeleteMember(p);
             return NoContent();
         }
-        [HttpPut("id")]
-        public IActionResult UpdateMember(int id, Member m)
+        [HttpPut("{id}")]
+        public IActionResult UpdateMember(Member m)
         {
-            var mTmp = repository.GetMemberById(id);
+            var mTmp = repository.GetMemberById(m.MemberId);
             if (m == null)
             {
                 return NotFound();
