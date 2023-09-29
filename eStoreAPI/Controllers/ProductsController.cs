@@ -19,7 +19,7 @@ namespace eStoreAPI.Controllers
             repository.AddProduct(p);
             return NoContent();
         }
-        [HttpDelete("id")]
+        [HttpDelete("{id}")]
         public ActionResult Delete(int id)
         {
             var product = repository.GetProductById(id);
@@ -30,7 +30,7 @@ namespace eStoreAPI.Controllers
             repository.DeleteProduct(product);
             return NoContent();
         }
-        [HttpPut("id")]
+        [HttpPut("{id}")]
         public ActionResult UpdateProduct(Product p, int id)
         {
             var pTmp = repository.GetProductById(id);
