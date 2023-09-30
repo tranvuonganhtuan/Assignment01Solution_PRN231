@@ -31,6 +31,20 @@ namespace eStoreAPI.Controllers
             return Ok(order);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Order>> GetMemberById(int id)
+        {
+            var order = repository.GetMemberById(id);
+
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(order);
+        }
+
+
         [HttpPost]
         public IActionResult PostOrders(Order o)
         {

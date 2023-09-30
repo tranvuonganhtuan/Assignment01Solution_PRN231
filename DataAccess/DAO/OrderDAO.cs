@@ -1,5 +1,6 @@
 ﻿using BusinessObject.Models;
 using DataAccess.Repository;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,23 @@ namespace DataAccess.DAO
                 using (var context = new FStoreDBContext())
                 {
                     o = context.Orders.SingleOrDefault(x => x.OrderId == orderId);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return o;
+        }
+
+        public static Member FindMemberById(int memberId)
+        {
+            Member o = new Member();
+            try
+            {
+                using (var context = new FStoreDBContext())
+                {
+                    o = context.Members.SingleOrDefault(x => x.MemberId == memberId);
                 }
             }
             catch (Exception ex)

@@ -11,13 +11,15 @@ namespace DataAccess.Repository
     public class OrderRepository : IOrderRepository
     {
         public void AddOrder(Order order) =>OrderDAO.AddOrder(order);
+
         
 
         public void DeleteOrder(Order order) => OrderDAO.DeleteOrder(order);
         
 
         public List<Order> GetAllOrders() => OrderDAO.GetOrders();
-        
+
+        public Member GetMemberById(int memberId) => MemberDAO.FindMemberById(memberId);
 
         public Order GetOrderById(int orderId) => OrderDAO.FindOrderById(orderId);
         
